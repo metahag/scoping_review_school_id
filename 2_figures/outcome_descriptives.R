@@ -165,7 +165,11 @@ ggsave(
    group_by(covidence_study, examiner_clean) %>% 
    unique() %>% 
    ungroup() %>% 
-   count(examiner_clean) 
+   count(examiner_clean) %>% 
+   mutate(total_n = sum(n),
+         percent = (n / total_n) * 100)
+
+
  
  
  #examiner_plot <- 
@@ -207,10 +211,4 @@ outcome_category %>%
         x = "Outcome Category")
  
  ggsave(filename = here("2_figures", "figs", "outcome_category.png"))
- 
- 
- 
- 
- 
- 
  
