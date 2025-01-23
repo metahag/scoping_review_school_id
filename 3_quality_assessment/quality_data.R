@@ -81,5 +81,62 @@ ggsave(
     height = 1500,
     units = "px"
   )
+
   
+########## descriptive statistics ##########
+  # Calculate overall percentage of TRUE for ethical_approval
+  ethics_overall_percentage <- ethics_year %>%
+    summarise(percentage_true = sum(ethical_approval) / (sum(ethical_approval) + sum(!ethical_approval)) * 100) %>%
+    pull(percentage_true)
+  
+  # Calculate the year with highest and lowest percentage of TRUE for ethical_approval
+  ethics_year_percentage <- ethics_year %>%
+    group_by(published_year) %>%
+    summarise(percentage_true = sum(ethical_approval) / (sum(ethical_approval) + sum(!ethical_approval)) * 100) %>%
+    filter(!is.na(percentage_true))
+  
+  ethics_highest_lowest_year <- ethics_year_percentage %>%
+    summarise(lowest_year = published_year[which.min(percentage_true)],
+              highest_year = published_year[which.max(percentage_true)])
+  
+  # Print results
+  cat("Overall Percentage of TRUE for ethical_approval:", ethics_overall_percentage, "%\n")
+  cat("Year Range for TRUE in ethical_approval:\n")
+  print(ethics_highest_lowest_year)
+  
+  
+  # Calculate overall percentage of TRUE for consent
+ consent_overall_percentage <- ethics_year %>%
+    summarise(percentage_true = sum(consent) / (sum(consent) + sum(!consent)) * 100) %>%
+    pull(percentage_true)
+  
+  # Calculate the year with highest and lowest percentage of TRUE for consent
+ consent_year_percentage <- ethics_year %>%
+    group_by(published_year) %>%
+    summarise(percentage_true = sum(consent) / (sum(consent) + sum(!consent)) * 100) %>%
+    filter(!is.na(percentage_true))
+  
+ consent_highest_lowest_year <- consent_year_percentage %>%
+    summarise(lowest_year = published_year[which.min(percentage_true)],
+              highest_year = published_year[which.max(percentage_true)])
+  
+  # Print results
+  cat("Overall Percentage of TRUE for consent:", consent_overall_percentage, "%\n")
+  cat("Year Range for TRUE in consent:\n")
+  print(consent_highest_lowest_year)
+  
+###### descriptives shared materials #############
+  # Calculate combined percentage of "Yes" and "Yes, inadequately" for materials_adequate
+  overall_materials_percentage <- ethics_year %>%
+    summarise(percentage_yes = sum(materials_adequate %in% c("Yes", "Yes, inadequately")) / n() * 100) %>%
+    pull(percentage_yes)
+  
+  # Calculate percentage of "Yes" and "Yes, inadequately" for materials_adequate per year
+  materials_year_percentage <- ethics_year %>%
+    group_by(published_year) %>%
+    summarise(percentage_yes = sum(materials_adequate %in% c("Yes", "Yes, inadequately")) / n() * 100)
+
+  cat("Overall Percentage of 'Yes' and 'Yes, inadequately' for materials_adequate:", overall_materials_percentage, "%\n")
+  cat("Yearly Percentage of 'Yes' and 'Yes, inadequately' for materials_adequate:\n")
+  print(materials_year_percentage)
   
