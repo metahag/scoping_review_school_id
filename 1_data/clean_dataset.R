@@ -90,6 +90,7 @@ clean_shiny <- shiny_dataset %>%
                                categories$rationale_clean[match(rationale, categories$rationale_unique_hard_values)], 
                                rationale),
     design_category = case_when(
+      is.na(design_category) ~ NA_character_, 
       design_category != "Other" ~ design_category,
       other_design %in% categories$study_design_unique_hard_values ~ 
         coalesce(categories$study_design_clean[match(other_design, categories$study_design_unique_hard_values)], "Other"),
