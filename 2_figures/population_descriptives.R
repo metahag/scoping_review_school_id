@@ -315,6 +315,25 @@ idd_design <- idd_design %>%
          !is.na(design_type),
          design_type != "Other") # remove again for consistency with other plots
 
+#### descriptives for the levels per design ####
+# Calculate total n for each design type
+data_with_totals <- idd_design %>%
+  group_by(design_type) %>%
+  filter(idd_level != "not reported") %>% 
+  mutate(total_n = sum(n)) %>%
+  ungroup()
+
+# Calculate the percentage for the specific idd_levels
+specific_levels <- data_with_totals %>%
+  filter((design_type == "Group Design" & idd_level == "mild") |
+           (design_type == "Single-Case Design" & idd_level == "moderate")) %>%
+  mutate(percent = (n / total_n) * 100) %>%
+  select(design_type, idd_level, n, total_n, percent)
+
+specific_levels
+
+######## plots ############
+
 idd_design_plot <- 
 idd_design %>% 
   ggplot(aes(x = idd_level, y = n, fill = design_type)) +
@@ -424,17 +443,3 @@ pop_int <- clean_shiny %>%
   drop_na() %>% 
   ungroup() %>% 
   count(population_of_interest)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
