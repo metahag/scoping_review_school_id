@@ -1,7 +1,6 @@
 library(shiny)
 library(DT)
 library(bslib)
-library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(vroom)
@@ -9,7 +8,7 @@ library(showtext)
 library(here)
 
 # Load custom font
-font_add("FontAwesome", regular = "../figures/Font Awesome 5 Free-Solid-900.otf")
+font_add("FontAwesome", regular = here("1_data", "Font Awesome 5 Free-Solid-900.otf"))
 font_add_google("Space Mono", "space_mono")
 showtext_auto()
 
