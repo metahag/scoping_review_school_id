@@ -66,7 +66,9 @@ implementer <-
   group_by(covidence_study, instructor_clean) %>% 
   unique() %>% 
   ungroup() %>% 
-  count(instructor_clean) 
+  count(instructor_clean) %>% 
+  mutate(total_n = sum(n),
+         percent = (n / total_n) * 100)
 
 
 #implementer_plot <- 
@@ -96,7 +98,9 @@ setting_r <-
   group_by(covidence_study, setting_room_clean) %>% 
   unique() %>% 
   ungroup() %>% 
-  count(setting_room_clean) 
+  count(setting_room_clean) %>% 
+  mutate(total_n = sum(n),
+         percent = (n / total_n) * 100)
 
 
 #setting_plot <- 
@@ -116,3 +120,48 @@ ggsave(
   width = 2200,
   units = "px"
 )
+
+########################## design #########################
+design_percent <- clean_shiny %>%
+  # Select relevant columns
+  select(covidence_study, design_category) %>%
+  # group by study
+  group_by(covidence_study) %>% 
+  # remove NA values
+  filter(!is.na(design_category)) %>% 
+  # remove duplicate values within study
+  distinct() %>% 
+  # Relabel design categories and create SCD and group category
+  mutate(
+    design_category = recode(design_category,
+                             `Mixed (both between and within)` = "Pre-Post Comparison Design",
+                             `Randomized Control Trial` = "Pre-Post Comparison Design"),
+    design_type = case_when(
+      design_category %in% c("Other Single-case Design",
+                             "Changing criterion design",
+                             "A-B Design (Pre-Post Design)",
+                             "A-B-A (or A-B-A-B) Design (Reversal Design)",
+                             "Alternating Treatments Design",
+                             "Combined Single-case Designs",
+                             "Multiple Baseline Design",
+                             "Multiple Probe Design") ~ "Single-Case Design",
+      design_category %in% c("Mixed (both between and within)",
+                             "Within participants",
+                             "Randomized Control Trial",
+                             "Longitudinal Design",
+                             "Mixed Methods Design",
+                             "Between participants",
+                             "Quasi-experimental Design",
+                             "Pre-Post Comparison Design",
+                             "Other Group Design") ~ "Group Design",
+      design_category == "Pilot" ~ "Other",
+      TRUE ~ design_category
+    )
+  ) %>%
+  # Count the occurrences of each design type
+  group_by(design_category) %>% 
+  count(design_category, name = "count") %>%
+  # Filter out uncommon designs (fewer than 20)
+  filter(count >= 20) %>%
+  # Calculate percentages of the total
+  mutate(percentage = (count / sum(count)) * 100)
