@@ -3,6 +3,8 @@
 
 This repository contains all the necessary files, scripts, and data for analyzing and visualizing results from a scoping review of school-based interventions for students with IDD. You can find supplementary materials available here: [https://doi.org/10.17605/OSF.IO/NECA5](https://doi.org/10.17605/OSF.IO/NECA5)
 
+Access the Shiny App with the dataset here: [School-based interventions for students with ID](http://wanda.lnu.se:3838/scoping_review_school_id/shiny_app_scoping/)
+
 Below is an overview of the repository structure and the purpose of its components.
 
 ---
