@@ -38,6 +38,19 @@ design_size <- clean_shiny %>%
     )
   ) 
 
+rct_number <- clean_shiny %>%
+  select(covidence_study, design_category) %>%
+  group_by(covidence_study) %>% 
+  filter(!is.na(design_category)) %>% 
+  distinct() %>% 
+  ungroup() %>%
+  filter(design_category == "Randomized Control Trial") %>%
+  tally()
+
+prepost_n <- design_size %>% filter(design_category == "Pre-Post Comparison Design") %>% 
+  ungroup() %>% count()
+
+rct_pct <- (rct_number / prepost_n) * 100
 
 #extract sample size per study
 sample_size <- clean_shiny %>% 
