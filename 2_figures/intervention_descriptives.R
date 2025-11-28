@@ -68,7 +68,8 @@ implementer <-
   ungroup() %>% 
   count(instructor_clean) %>% 
   mutate(total_n = sum(n),
-         percent = (n / total_n) * 100)
+         percent = (n / total_n) * 100) %>% 
+  arrange(desc(n))
 
 
 #implementer_plot <- 
@@ -100,7 +101,8 @@ setting_r <-
   ungroup() %>% 
   count(setting_room_clean) %>% 
   mutate(total_n = sum(n),
-         percent = (n / total_n) * 100)
+         percent = (n / total_n) * 100) %>% 
+  arrange(desc(n))
 
 
 #setting_plot <- 
@@ -135,7 +137,8 @@ design_percent <- clean_shiny %>%
   mutate(
     design_category = recode(design_category,
                              `Mixed (both between and within)` = "Pre-Post Comparison Design",
-                             `Randomized Control Trial` = "Pre-Post Comparison Design"),
+                             `Randomized Control Trial` = "Pre-Post Comparison Design",
+                             `Combined Single-case Designs"` = "Other Single-case Design"),
     design_type = case_when(
       design_category %in% c("Other Single-case Design",
                              "Changing criterion design",
@@ -165,3 +168,6 @@ design_percent <- clean_shiny %>%
   filter(count >= 20) %>%
   # Calculate percentages of the total
   mutate(percentage = (count / sum(count)) * 100)
+
+
+

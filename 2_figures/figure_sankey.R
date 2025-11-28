@@ -99,7 +99,15 @@ p <- sankeyNetwork(Links = links,
                    nodePadding = 20,    
                    colourScale = colorscale
 )
-p
+p <- htmlwidgets::onRender(
+  p,
+  "
+  function(el, x) {
+    el.style.background = 'transparent';
+    document.body.style.background = 'transparent';
+  }
+  "
+)
 
 # Save the Sankey widget
 saveWidget(
@@ -118,3 +126,6 @@ webshot(
   vheight = 840,   
   zoom = 4
 )
+
+links_report <- links %>% 
+  arrange(desc(value))

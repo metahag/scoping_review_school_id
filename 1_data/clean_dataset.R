@@ -14,6 +14,7 @@ library(patchwork)
 library(ggpattern)
 library(tm)
 library(wordcloud2)
+library(papaja)
 
 # Showtext configurations
 showtext_auto()

@@ -5,8 +5,46 @@ names(countries) <- "country_clean"
 countries <- countries %>%
   filter(!is.na(country_clean)) %>% 
   separate_longer_delim(country_clean, delim = ",") %>% 
+  mutate(country_clean = trimws(country_clean, "both")) %>% 
   group_by(country_clean) %>% 
-  count()
+  count() %>% 
+  arrange(desc(n))
+
+countries_studies <- as.data.frame(compressed_data$country_clean)
+names(countries_studies) <- "country_clean"
+countries_studies <- countries_studies %>%
+  separate_longer_delim(country_clean, delim = ",") %>% 
+  mutate(country_clean = trimws(country_clean, "both")) %>% 
+  group_by(country_clean) %>% 
+  count() %>%
+  mutate(continent = case_when(
+    country_clean %in% c("Belgium","France","Germany","Greece","Ireland","Italy",
+                         "Netherlands","Norway","Poland","Portugal","Romania","Russia",
+                         "Serbia","Slovenia","Spain","Sweden","Switzerland","UK","Wales",
+                         "Czech Republic","North Macedonia","Ukraine", "N. Cyprus") ~ "Europe",
+    
+    country_clean %in% c("India","China","Japan","Indonesia","South Korea","Singapore",
+                         "Taiwan","Thailand","Vietnam","Pakistan","Sri Lanka", 
+                         "Turkey","Israel","Lebanon","Iran","Saudi Arabia","Kuwait",
+                         "United Arab Emirates","Armenia","Kazakhstan") ~ "Asia",
+    
+    country_clean %in% c("Australia","New Zealand") ~ "Oceania",
+    
+    country_clean %in% c("Egypt","Ghana","Nigeria","South Africa","Tunisia") ~ "Africa",
+    
+    country_clean %in% c("Brazil","Chile","Ecuador","Mexico","Puerto Rico",
+                         "Venezuela") ~ "Latin America",
+    
+    country_clean %in% c("Canada","USA") ~ "North America",
+    
+    TRUE ~ NA_character_
+  )) %>% ungroup()
+
+countries_rest <- countries_studies %>%
+  group_by(continent) %>% 
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  arrange(desc(total_n)) %>% ungroup()
+
 
 # Get world map new_data
 world_map <- map_data("world")

@@ -1,0 +1,88 @@
+---
+title: "results"
+format: docx
+echo: false
+warning: false
+message: false
+---
+```{r}
+#| output: false
+library(here)
+options(scipen = 999)
+source(here("1_data","clean_dataset.R"))
+source(here("2_figures","population_descriptives.R"))
+source(here("2_figures","outcome_descriptives.R"))
+source(here("2_figures","intervention_descriptives.R"))
+source(here("2_figures","figure_sankey.R"))
+source(here("2_figures","country_map.R"))
+source(here("2_figures","publications_info.R"))
+source(here("3_quality_assessment","quality_data.R"))
+
+```
+
+```{r}
+all_tables <- list(
+  "Interventionist" = implementer,
+  "Examiner"        = examiner,
+  "Setting"         = setting_r
+) 
+
+all_tables <- lapply(all_tables, function(df) {
+  df %>% arrange(desc(n))
+})
+
+combined_df <- bind_rows(all_tables, .id = "Variable")
+
+combined_df <- combined_df %>%
+  mutate(
+    percent = round(percent, 1) 
+  ) %>%
+  rename(
+    Category = Variable,         
+    N = n,
+    `Total N` = total_n,
+    `%` = percent
+  )
+
+apa_table(
+  combined_df,
+  caption = "Descriptive statistics for the intervention characteristics.",
+  note = "Percentages are based on the total N in each section, not on the complete sample of 952 studies, as some studies did not report the needed information."
+)
+```
+
+Critical Appraisal Results
+
+Ethical approval was stated in `r round(ethics_overall_percentage, 1)`% of reports overall, with the lowest percent coming from articles published in `r round(ethics_highest_lowest_year[1,1], 1)`, and the highest in `r round(ethics_highest_lowest_year[1,2], 1)`. Consent statements were more common, with `r round(consent_overall_percentage, 1)`% articles reporting them. The lowest percent was in  `r round(consent_highest_lowest_year[1,1], 1)` and highest again in `r round(consent_highest_lowest_year[1,2], 1)`. Although there is an upward trend of sharing this information, most likely driven by newer journal guidelines, there is still a higher number of studies that do not provide this information. Furthermore, some studies seem to reuse what appears to be standard template information on ethical approval and following the Declaration of Helsinki, which makes it even harder to assess the existence of ethical approval. Extracted statements are available on OSF.
+We assessed whether the studies reported information about a preregistration and whether they shared data and materials. When it comes to preregistration, there was not one study that specified having a protocol before the study. Some trial studies reported trial protocols however, although not all were specified as a-priori protocols. 
+When it comes to sharing data, we evaluated whether they shared data in the form of a dataset of individual participants, which means we did not consider graphical data of participants as open data, especially since it was not always clearly graphed out. Only one study shared a link to a repository (https://figshare.com/) which provides digital identifier objects (DOI) for datasets, with an open dataset and codebook (Alonso-Campuzano et al., 2023). No other study had a working link to an open dataset. Interestingly, some studies claimed they had no data to share as it was “not applicable”, “available in the main text”, “available in a publicly accessible repository” without providing any information about the repository, or even that “no data was used for the research described in the article”. 
+Shared materials have been harder to evaluate properly, as it is not always completely clear which materials are crucial to reproduce a study. When a study shared procedural material (e.g., task analysis or social validity checklists, images of materials used in teaching), we regarded it as some material provided. Then we evaluated if it was adequately shared (i.e., in a repository that provides a separate DOI). Sharing materials (at least partially), seems to be slightly more common (`r round(overall_materials_percentage, 1)`% articles), however there is barely any improvement in it quantitatively over the years, and the focus on explaining and guiding reuse of materials is almost non-existent. Extracted data about all principles is on OSF.
+
+
+Synthesis of results
+In this section, we first present general demographic characteristics of the population, and follow with results answering the four objectives. Data analysis was conducted in R (R Core team, 2021).
+
+Large majority of the studies come from `r countries_rest[1,1]` (`r countries_rest[1,2]`; the USA and Canada). There were `r countries_rest[2,2]` studies from `r countries_rest[2,1]`, `r countries_rest[3,2]` from `r countries_rest[3,1]`, `r countries_rest[5,2]` from `r countries_rest[5,1]`, `r countries_rest[6,2]` from `r countries_rest[6,1]`, and `r countries_rest[7,2]` from `r countries_rest[7,1]`. From the continents, countries with most studies were the `r countries[1,1]` (n = `r round(countries[1,2], 0)`), `r countries[2,1]` (n = `r round(countries[2,2], 0)`), `r countries[3,1]` (n = `r round(countries[3,2], 0)`), the `r countries[4,1]` (n = `r round(countries[4,2], 0)`), `r countries[5,1]` (n = `r round(countries[5,2], 0)`), `r countries[6,1]` (n = `r round(countries[6,2], 0)`), and `r countries[7,1]` (n = `r round(countries[7,2], 0)`). Some of the studies were done in multiple countries, and information was not available for `r countries_studies[1,2]` studies.
+
+Overall, we extracted available information from `r round(sample_size_overall,0)` eligible participants, and slightly more than half (k studies = `r pop_int[1,2]`) of the studies were primarily interested in participants with intellectual disabilities. The remainder of included studies (k studies = `r pop_int[2,2]`) had a broader population of interest, focusing on multiple or different disabilities, but still including participants eligible for this review. For example, if a study was interested in students with intellectual disability and autism spectrum disorder, that would be considered a broader population of interest. Level of intellectual disability severity varied and was most often not clearly reported (`r idd_lev[4,2]` studies). Overall, most participants were classified as having moderate (`r idd_lev[3,2]` groups and/or individual participants), followed by mild intellectual disability (`r idd_lev[1,2]` groups and/or individual participants). 
+
+Objective 1: What are the types of educational interventions designed to improve various outcomes?
+
+Figure 4 shows an alluvial diagram which connects intervention categories (explained in Table 2) to the outcome categories. The interventions which had multiple themes assigned to them were separated, which means that the diagram represents how many times a theme has been connected to a specific category of the outcomes. `r links_report[1,1]` were most common, and most implemented to improve `r links_report[1,2]` (n = `r links_report[1,3]`). Following that, interventions which implemented a certain type of instruction (i.e., `r links_report[2,1]`) were most associated with `r links_report[2,2]` (n = `r links_report[2,3]`). `r links_report[3,1]` were majorly connected to `r links_report[3,2]` (n = `r links_report[3,3]`). `r links_report[4,1]` was also largely employed to evaluate `r links_report[4,2]` (n = `r links_report[4,3]`). `r links_report[5,1]` aimed at improving `r links_report[5,2]` had n = `r links_report[5,3]` connections. 
+
+For `r links_report[4,2]`, the most common approach was again `r links_report[4,1]` (n = `r links_report[4,3]`). When targeting `r links_report[6,2]`, studies primarily used `r links_report[6,1]` (n = `r links_report[6,3]`), whereas research focusing on `r links_report[8,2]` most frequently implemented `r links_report[8,1]` (n = `r links_report[8,3]`). The leading intervention category linked to `r links_report[14,2]` was `r links_report[14,1]` (n = `r links_report[14,3]`).
+
+Table 2 describes category frequencies for the setting, implementers of the intervention and the examiners. Classroom settings were the most common (`r round(setting_r[1,4],2)`%), with other settings within schools being the second most frequent (`r round(setting_r[2,4],2)`%). Other settings were equally rarely utilized, with below 20 studies reporting each one. Interventions were most commonly delivered by someone from the research team in over 300 studies (`r round(implementer[1,4],2)`%), followed by interventions delivered by the teachers (`r round(implementer[2,4],2)`%). `r round(implementer[3,4],2)`% were implemented by `r implementer[3,1]`, and combinations of researchers and educators, and educators and supporting staff were implemented `r round(implementer[4,4],2)`% and `r round(implementer[5,4],2)`%, resp.
+
+Outcomes were most assessed by someone from the research team (`r round(examiner[1,4],2)`%), followed by a combination of someone from the research team, and someone from the educational staff (`r round(examiner[2,4],2)`%). Very closely to the combined category was assessment done by the teachers (`r round(examiner[3,4],0)`%). All frequencies are presented in Table 2
+
+Objective 2: What research designs were used to investigate the effectiveness of interventions?
+Figure 4 describes most commonly reported study designs and median sample sizes of participants for each design, grouped by a group or single-case approach. In common group designs, most studies employed pre-post comparison designs (k studies = `r mean_sample_design[2,6]`; `r round(rct_pct[1,1], 0)`% of which were randomized controlled trials) with a large range of sample sizes, a median of n = `r mean_sample_design[2,5]` participants and maximum sample size of n = `r mean_sample_design[2,8]`. Other group designs (k studies = `r mean_sample_design[1,6]` for between participants, and k = `r mean_sample_design[3,6]` for within participants) had a median sample size ranging from `r mean_sample_design[3,5]` to `r mean_sample_design[1,5]` participants, and maximum sample sizes from `r mean_sample_design[1,8]` to `r mean_sample_design[3,8]` participants. 
+
+Generally, more common were single-case designs [SCD], out of which multiple probe designs are by far the most common (k studies = `r mean_sample_design[8,6]`), with median sample sizes being n = `r round(mean_sample_design[4,5],0)` participants across all SCDs, except reversal design (n=`r mean_sample_design[5,5]`). Maximum sample size in SCDs varied from n = `r mean_sample_design[5,8]` to n = `r mean_sample_design[7,8]`, with `r mean_sample_design[7,8]` participants being part of an SCD study that employed an intervention on the class level. Reported levels of disability also varied across designs, with participants with mild intellectual disability being the most common in group designs (`r round(specific_levels[1,5],2)`%), while SCDs most often included participants with moderate intellectual disability (`r round(specific_levels[2,5],2)`%).
+
+Objective 3: Which measurements were used to assess the effectiveness?
+Figure 5 displays the proportion of standardized versus researcher-created instruments utilized in the included studies, presented for the most common study designs. Pre-post comparison group designs employed standardized measures more often than tools developed by the researcher for their study, but overall group designs had a similar percentage of standardized and non-standardized (overall non-standardized measures `r round((pct_group_bespoke[1,2]/pct_group_bespoke[1,1])*100, 2)`), while SCDs more often relied on instruments created specifically for the purposes of their conducted study (overall non-standardized `r round((pct_scd_bespoke[1,2]/pct_scd_bespoke[1,1])*100, 2)`. 
+
+Objective 4: Which theoretical frameworks are the basis of the interventions?
+We extracted information about any mentioned theoretical frameworks that could have been the basis or a rationale for the conducted intervention. Majority (96%) of the studies had an unclear theoretical framework, and mostly focused on results from previous research, aiming to replicate or build on those findings. Social Learning Theory by Bandura (`r lol_rationale[14,2]` times), and the Self-Determination theories (`r lol_rationale[13,2]` times) were the only theories mentioned more than ten times. All theories mentioned in more than one study are presented in Figure 6. 

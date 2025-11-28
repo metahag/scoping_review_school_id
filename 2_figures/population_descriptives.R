@@ -14,7 +14,8 @@ design_size <- clean_shiny %>%
   mutate(
     design_category = recode(design_category,
                              `Mixed (both between and within)` = "Pre-Post Comparison Design",
-                             `Randomized Control Trial` = "Pre-Post Comparison Design"),
+                             `Randomized Control Trial` = "Pre-Post Comparison Design",
+                             `Combined Single-case Designs` = "Other Single-case Design"),
     design_type = case_when(
       design_category %in% c("Other Single-case Design",
                              "Changing criterion design",
@@ -242,7 +243,7 @@ combined_plot <- group_design_plot +
     theme = theme(
       plot.margin = margin(t = 10, r = 20, b = 40, l = 20)  # Global margins
     )
-  )
+  ) & theme(plot.background = element_rect(fill = "transparent"))
 
 
 # Display the combined plot
@@ -444,6 +445,7 @@ sample_size_overall <- clean_shiny %>%
                            "98", "102")) &
            !(other_diagnosis %in% c("no ID", "Typically Developing Children",
                                     "typically developing comparison"))) %>% 
+  select(sample_size_clean) %>% 
   # Summarize the total sample size
   summarise(total_sample_size = sum(sample_size_clean, na.rm = TRUE)) %>% 
   pull(total_sample_size)

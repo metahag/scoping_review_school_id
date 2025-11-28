@@ -113,7 +113,16 @@ group_plot <- ggplot(group_design_data, aes(x = paste0(design_category, " (n = "
                               pattern = response)) +
   geom_col_pattern(position = position_dodge(width = 0.65),
                    width = 0.5,
-                   alpha = 0.5) +
+                   alpha = 0.5) + 
+  geom_text(
+    aes(label = paste0(round(proportion, digits = 1),"%"),
+        y = 95), 
+    #nudge_x = 0.2,
+    #nudge_y = 1,
+    size = 3,
+    color = "#AD2931",
+    position = position_dodge(width = 0.45)
+  ) +
   scale_fill_manual(values = c("Yes" = "#AD2831", "No" = "#AD2831")) +
   scale_pattern_manual(values = c("Yes" = "stripe", "No" = "circle")) +
   coord_flip() +
@@ -134,6 +143,15 @@ single_plot <- ggplot(single_case_design_data, aes(x = paste0(design_category, "
   geom_col_pattern(position = position_dodge(width = 0.65),
                    width = 0.5,
                    alpha = 0.5) +
+  geom_text(
+    aes(label = paste0(round(proportion, digits = 1),"%"),
+        y = 105), 
+    #nudge_x = 0.5,
+    #nudge_y = -1,
+    size = 3,
+    color = "#003059",
+    position = position_dodge(width = 0.65)
+  ) +
   scale_fill_manual(values = c("Yes" = "#003049", "No" = "#003049")) +
   scale_pattern_manual(values = c("Yes" = "stripe", "No" = "circle")) +
   coord_flip() +
@@ -147,7 +165,7 @@ single_plot <- ggplot(single_case_design_data, aes(x = paste0(design_category, "
 
 
 # Combine the two plots using patchwork
-combined_plot <- group_plot / single_plot
+combined_plot <- (group_plot / single_plot) & theme(plot.background = element_rect(fill = "transparent"))
 
 # Save the combined plot
 ggsave(
@@ -166,8 +184,10 @@ ggsave(
    unique() %>% 
    ungroup() %>% 
    count(examiner_clean) %>% 
+   arrange(desc(n)) %>% 
    mutate(total_n = sum(n),
-         percent = (n / total_n) * 100)
+         percent = (n / total_n) * 100) %>% 
+  arrange(desc(n))
 
 
  
@@ -212,3 +232,13 @@ outcome_category %>%
  
  ggsave(filename = here("2_figures", "figs", "outcome_category.png"))
  
+ #### percentages of bespoke measures per design category
+ pct_group_bespoke <- group_design_data %>% 
+   filter(response == "No") %>% 
+   summarise(total_sum = sum(total),
+             no_sum = sum(count))
+ 
+ pct_scd_bespoke <- single_case_design_data %>% 
+   filter(response == "No") %>% 
+   summarise(total_sum = sum(total),
+             no_sum = sum(count))
