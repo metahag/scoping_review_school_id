@@ -102,7 +102,7 @@ shiny_population <- compressed_data %>%
          participant_id, sample_size_clean, gender_clean, school_level)
 
 shiny_intervention <- compressed_data %>% 
-  select(doi, covidence_id, intervention_theme, intervention, operationalization, rationale_clean, 
+  select(doi, covidence_id, design_category, intervention_theme, intervention, operationalization, rationale_clean, 
          instructor_clean, setting_institution_clean, setting_room_clean)
 
 shiny_outcome <- compressed_data %>% 
@@ -115,7 +115,7 @@ shiny_integrity <- ethics_year %>%
 #entire dataset
 shiny_complete <- compressed_data %>% 
   select(covidence_id, covidence_study, population_of_interest, country_clean,
-         participant_id, sample_size_clean, gender_clean, school_grade, school_level,
+         participant_id, sample_size_clean, gender_clean, school_grade, school_level, design_category,
          intervention_theme, intervention, operationalization, rationale_clean, 
          instructor_clean, setting_institution_clean, setting_room_clean,
          category, instrument_standardization, outcome, operationalization_of_the_outcome, examiner_clean)
@@ -184,7 +184,10 @@ ui <- fluidPage(
                       selectInput("filter_theme", "Intervention Theme", 
                                   choices = c("All", unique_values_recursive(shiny_intervention, intervention_theme, "\\|", ",")), 
                                   selected = "All"),
-                      DT::dataTableOutput("intervention_table")
+                      selectInput("filter_design", "Study Design", 
+                                  choices = c("All", unique_values_recursive(shiny_intervention, design_category, "\\|", ",")), 
+                                  selected = "All"),
+                      DT::dataTableOutput("intervention_table"),
              ),
              tabPanel("Outcome",
                       selectInput("filter_category", "Outcome Category", 
@@ -200,9 +203,6 @@ ui <- fluidPage(
   downloadButton("download", "Download Dataset (filtered or complete) (.tsv)")
 )
 
-
-
-
 ######################################################################################################
 ################################################### Define server ####################################
 ######################################################################################################
@@ -214,7 +214,12 @@ server <- function(input, output) {
   })
   
   filtered_intervention <- reactive({
-    split_and_filter(shiny_intervention, "intervention_theme", input$filter_theme)
+    data <- shiny_intervention
+    
+    data <- split_and_filter(data, "intervention_theme", input$filter_theme)
+    data <- split_and_filter(data, "design_category", input$filter_design)
+    
+    data
   })
   
   filtered_outcome <- reactive({
@@ -228,6 +233,9 @@ server <- function(input, output) {
     }
     if (input$filter_theme != "All") {
       data <- data %>% split_and_filter("intervention_theme", input$filter_theme)
+    }
+    if (input$filter_design != "All") {
+      data <- data %>% split_and_filter("design_category", input$filter_design)
     }
     if (input$filter_category != "All") {
       data <- data %>% split_and_filter("category", input$filter_category)
@@ -291,11 +299,11 @@ server <- function(input, output) {
       mutate(
         color = dplyr::case_when(
           is.na(n)            ~ "gray",
-          n < 10              ~ "#ffe5e5",
-          n >= 10 & n <= 20   ~ "#f28c8c",
+          n < 10              ~ "#A94064",
+          n >= 10 & n <= 20   ~ "#380404",
           n >= 21 & n <= 50   ~ "#800e13",
-          n >= 51 & n <= 100  ~ "#380404",
-          n > 500             ~ "#A94064"
+          n >= 51 & n <= 100  ~ "#f28c8c",
+          n > 500             ~ "#ffe5e5"
         )
       )
   })
